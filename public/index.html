@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grok Bot 调研 · 2026</title>
+  <style>
+    :root {
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: "SF Mono", "Cascadia Code", "Consolas", monospace;
+      --bg: #ffffff;
+      --surface: #f9fafb;
+      --surface-2: #f3f4f6;
+      --border: #e5e7eb;
+      --text: #111827;
+      --text-2: #6b7280;
+      --text-3: #9ca3af;
+      --accent: #2563eb;
+      --accent-bg: #eff6ff;
+      --green: #059669;
+      --green-bg: #ecfdf5;
+      --orange: #d97706;
+      --orange-bg: #fffbeb;
+      --red: #dc2626;
+      --red-bg: #fef2f2;
+      --purple: #7c3aed;
+      --purple-bg: #f5f3ff;
+      --radius: 10px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    header {
+      text-align: center;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2.5rem;
+    }
+
+    .badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      background: var(--accent-bg);
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    header .subtitle {
+      font-size: 1rem;
+      color: var(--text-2);
+    }
+
+    .meta {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 1rem;
+      font-size: 0.8125rem;
+      color: var(--text-3);
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      margin-top: 2.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    p { margin-bottom: 1rem; font-size: 0.9375rem; color: var(--text); }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+    }
+
+    .card h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card p { font-size: 0.8125rem; color: var(--text-2); margin-bottom: 0; }
+
+    .icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.75rem;
+      height: 1.75rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .icon-blue { background: var(--accent-bg); }
+    .icon-green { background: var(--green-bg); }
+    .icon-orange { background: var(--orange-bg); }
+    .icon-purple { background: var(--purple-bg); }
+
+    .highlight-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .highlight-box p { margin-bottom: 0.5rem; }
+    .highlight-box p:last-child { margin-bottom: 0; }
+
+    .price-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .price-table th, .price-table td {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .price-table th {
+      background: var(--surface);
+      font-weight: 600;
+      font-size: 0.8125rem;
+      color: var(--text-2);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .price-table td:nth-child(2) {
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .compare-table th, .compare-table td {
+      text-align: left;
+      padding: 0.625rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .compare-table th {
+      background: var(--surface);
+      font-weight: 600;
+      font-size: 0.75rem;
+      color: var(--text-2);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .compare-table td:first-child {
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      padding: 0.125rem 0.4rem;
+      border-radius: 4px;
+    }
+
+    .tag-green { background: var(--green-bg); color: var(--green); }
+    .tag-orange { background: var(--orange-bg); color: var(--orange); }
+    .tag-red { background: var(--red-bg); color: var(--red); }
+    .tag-blue { background: var(--accent-bg); color: var(--accent); }
+
+    .timeline {
+      position: relative;
+      padding-left: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0.35rem;
+      top: 0.35rem;
+      bottom: 0.35rem;
+      width: 2px;
+      background: var(--border);
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+
+    .timeline-item:last-child { margin-bottom: 0; }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -1.15rem;
+      top: 0.55rem;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .timeline-item .date {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-3);
+    }
+
+    .timeline-item .event {
+      font-size: 0.875rem;
+    }
+
+    .callout {
+      background: var(--accent-bg);
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .callout h3 { color: var(--accent); margin-bottom: 0.5rem; }
+    .callout p { font-size: 0.8125rem; margin-bottom: 0; }
+
+    .connectors-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .connector {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      padding: 0.3rem 0.65rem;
+      border-radius: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+
+    .verdict {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .verdict h3 { margin-bottom: 0.75rem; }
+
+    .verdict ul {
+      list-style: none;
+      font-size: 0.875rem;
+    }
+
+    .verdict ul li {
+      padding: 0.3rem 0 0.3rem 1.25rem;
+      position: relative;
+    }
+
+    .verdict ul li::before {
+      content: '>';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+
+    .sources {
+      margin-top: 2.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .sources h3 { color: var(--text-2); font-size: 0.875rem; margin-bottom: 0.75rem; }
+
+    .sources ul {
+      list-style: none;
+      font-size: 0.8125rem;
+    }
+
+    .sources ul li {
+      padding: 0.25rem 0;
+    }
+
+    .sources a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .sources a:hover { text-decoration: underline; }
+
+    footer {
+      text-align: center;
+      margin-top: 2.5rem;
+      font-size: 0.75rem;
+      color: var(--text-3);
+    }
+
+    @media (max-width: 640px) {
+      .container { padding: 1.5rem 1rem 3rem; }
+      header h1 { font-size: 1.5rem; }
+      .card-grid { grid-template-columns: 1fr; }
+      .compare-table { font-size: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header>
+      <div class="badge">Research Note</div>
+      <h1>Grok Bot — xAI 的 Always-On AI Agent</h1>
+      <p class="subtitle">一台属于你的云端电脑，24/7 替你干活</p>
+      <div class="meta">
+        <span>调研日期: 2026-09-16</span>
+        <span>产品状态: Beta</span>
+        <span>发布方: xAI</span>
+      </div>
+    </header>
+
+    <h2>什么是 Grok Bot</h2>
+    <p>Grok Bot 是 xAI 于 2026 年 8 月 11 日推出的 AI Agent 产品。与传统聊天机器人不同，每个 Grok Bot 拥有一台<strong>持久化云端电脑</strong>——可以打开浏览器、读写文件、跑终端命令、登录你的应用账号，然后 7x24 小时替你干活。你关掉笔记本电脑，它继续工作；需要你拍板的时候才来找你。</p>
+
+    <div class="callout">
+      <h3>一句话理解</h3>
+      <p>你可以像给同事发消息一样给 Grok Bot 派任务，它会记住你们的对话、学习你的偏好，用得越多越顺手。本质上是"一个有自己电脑的 AI 同事"。</p>
+    </div>
+
+    <h2>核心能力</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3><span class="icon icon-blue">&#x1F4BB;</span> 云端电脑</h3>
+        <p>每个 Bot 拥有独立屏幕，共享同一台持久化云电脑。浏览器、文件系统、终端一应俱全，关机也不丢状态。</p>
+      </div>
+      <div class="card">
+        <h3><span class="icon icon-green">&#x1F517;</span> 原生连接器</h3>
+        <p>Gmail、Google Calendar/Drive、OneDrive、Outlook、Teams、SharePoint、Salesforce 开箱即用，无需 API 开发。</p>
+      </div>
+      <div class="card">
+        <h3><span class="icon icon-orange">&#x1F527;</span> MCP 支持</h3>
+        <p>支持 Remote MCP Server 接入，通过 Settings 添加 Connector，可扩展任意工具链。</p>
+      </div>
+      <div class="card">
+        <h3><span class="icon icon-purple">&#x1F916;</span> 多 Bot 协作</h3>
+        <p>多个 Bot 可以在群聊中互相传递任务、分配职责，实现 Agent Swarm 式的团队协作。</p>
+      </div>
+    </div>
+
+    <h2>连接器一览</h2>
+    <div class="connectors-list">
+      <span class="connector">Gmail</span>
+      <span class="connector">Google Calendar</span>
+      <span class="connector">Google Drive</span>
+      <span class="connector">OneDrive</span>
+      <span class="connector">Outlook</span>
+      <span class="connector">Microsoft Teams</span>
+      <span class="connector">SharePoint</span>
+      <span class="connector">Salesforce</span>
+      <span class="connector">MCP Server (Remote)</span>
+    </div>
+    <p style="font-size: 0.8125rem; color: var(--text-2);">没有连接器的应用？Bot 会直接通过浏览器操作网页（Computer Use），不过可能遇到 CAPTCHA 等限制。</p>
+
+    <h2>定价</h2>
+    <table class="price-table">
+      <thead>
+        <tr>
+          <th>订阅方案</th>
+          <th>价格</th>
+          <th>说明</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>SuperGrok Heavy</td>
+          <td>$300/月</td>
+          <td>最高级个人套餐</td>
+        </tr>
+        <tr>
+          <td>Cursor Ultra</td>
+          <td>$200/月</td>
+          <td>面向开发者</td>
+        </tr>
+        <tr>
+          <td>Cursor Teams Premium</td>
+          <td>$120/seat/月</td>
+          <td>团队协作</td>
+        </tr>
+        <tr>
+          <td>免费版</td>
+          <td>—</td>
+          <td>暂无免费 tier</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>与竞品对比</h2>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>维度</th>
+          <th>Grok Bot (xAI)</th>
+          <th>Claude Code (Anthropic)</th>
+          <th>ChatGPT Work (OpenAI)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>模型</td>
+          <td>Grok 4.3</td>
+          <td>Claude Opus 4.8 / Fable 5</td>
+          <td>GPT-5.5</td>
+        </tr>
+        <tr>
+          <td>Agent 形态</td>
+          <td>持久云电脑 + 多 Bot 协作</td>
+          <td>终端/IDE 内 Agent</td>
+          <td>单 Agent 多工作流</td>
+        </tr>
+        <tr>
+          <td>实时数据</td>
+          <td><span class="tag tag-green">强 (X 平台直连)</span></td>
+          <td><span class="tag tag-orange">WebSearch</span></td>
+          <td><span class="tag tag-orange">Bing 搜索</span></td>
+        </tr>
+        <tr>
+          <td>编程能力</td>
+          <td><span class="tag tag-green">SWE-bench 75%</span></td>
+          <td><span class="tag tag-green">SWE-bench 74%+</span></td>
+          <td><span class="tag tag-orange">略低</span></td>
+        </tr>
+        <tr>
+          <td>多 Agent</td>
+          <td><span class="tag tag-green">群聊互派任务</span></td>
+          <td><span class="tag tag-blue">Subagent 并行</span></td>
+          <td><span class="tag tag-orange">单 Agent</span></td>
+        </tr>
+        <tr>
+          <td>入门价格</td>
+          <td>$120/月起</td>
+          <td>$20/月 (Max $100)</td>
+          <td>免费起步</td>
+        </tr>
+        <tr>
+          <td>优势场景</td>
+          <td>自动化跨应用工作流</td>
+          <td>代码/工程深度任务</td>
+          <td>通用日常助手</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>时间线</h2>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="date">2026.08.11</div>
+        <div class="event">Grok Bot Beta 发布，绑定 SuperGrok Heavy 和 Cursor 订阅</div>
+      </div>
+      <div class="timeline-item">
+        <div class="date">2026.08 中旬</div>
+        <div class="event">企业版功能上线：访问控制、网络策略、审计日志</div>
+      </div>
+      <div class="timeline-item">
+        <div class="date">2026.09.15 – 17</div>
+        <div class="event">Grok Bot Galaxy 活动：三天直播展示 Agent 工作流</div>
+      </div>
+    </div>
+
+    <h2>需要注意的点</h2>
+    <div class="highlight-box">
+      <p><strong>共享电脑：</strong>同一账号下所有 Bot 共享一台云电脑、文件系统和浏览器凭证。不同 Bot 之间不构成安全边界，不适合隔离敏感凭证。</p>
+      <p><strong>Computer Use 限制：</strong>通过浏览器自动化操作网页时，可能被 CAPTCHA 或反自动化机制拦截。</p>
+      <p><strong>仅 Remote MCP：</strong>目前只支持远程 MCP Server，不支持本地 MCP。</p>
+      <p><strong>价格门槛高：</strong>最低 $120/seat/月，没有免费 tier，对个人用户不友好。</p>
+    </div>
+
+    <div class="verdict">
+      <h3>调研结论</h3>
+      <ul>
+        <li>Grok Bot 的"持久云电脑 + 多 Bot 协作"是目前 AI Agent 产品中最激进的形态</li>
+        <li>原生连接器覆盖了主流办公套件，适合跨应用自动化场景</li>
+        <li>价格偏高、Beta 阶段稳定性待验证，安全隔离机制不足</li>
+        <li>实时 X 平台数据是独家优势，其他竞品无法复制</li>
+        <li>编程能力与 Claude Code 接近，但开发者工具链生态不如 Claude</li>
+      </ul>
+    </div>
+
+    <div class="sources">
+      <h3>Sources</h3>
+      <ul>
+        <li><a href="https://x.ai/news/introducing-grok-bot" target="_blank">Introducing Grok Bot — xAI Official</a></li>
+        <li><a href="https://docs.x.ai/grok-bot/overview" target="_blank">Grok Bot Overview — xAI Docs</a></li>
+        <li><a href="https://www.vellum.ai/blog/official-grok-bot-breakdown" target="_blank">Official Grok Bot Breakdown — Vellum</a></li>
+        <li><a href="https://www.layer3labs.io/guides/what-is-grok-bot" target="_blank">Grok Bot Explained — Layer3 Labs</a></li>
+        <li><a href="https://www.ayautomate.com/blog/grok-bot-xai-ai-agents-explained" target="_blank">Grok Bot: xAI's Always-On AI Agents — AY Automate</a></li>
+        <li><a href="https://mem0.ai/blog/grok-bot-guide" target="_blank">Grok Bot Guide: Pricing, Features — Mem0</a></li>
+        <li><a href="https://moclaw.ai/blog/grok-bot-vs-claude-cowork-vs-chatgpt-work" target="_blank">Grok Bot vs Claude Cowork vs ChatGPT Work — MoClaw</a></li>
+        <li><a href="https://www.digitalapplied.com/blog/grok-bot-ai-teammates-launch-cloud-computer-2026" target="_blank">Grok Bot: AI Teammates Get Their Own Computer — Digital Applied</a></li>
+      </ul>
+    </div>
+
+    <footer>
+      调研 by Claude · 2026-09-16
+    </footer>
+
+  </div>
+</body>
+</html>
